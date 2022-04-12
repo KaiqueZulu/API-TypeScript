@@ -2,6 +2,7 @@ import AppError from '@shared/errors/appError';
 import { getCustomRepository } from 'typeorm';
 import UsersRepository from '../typeorm/repositories/UserRepository';
 import UsersTokenRepository from '../typeorm/repositories/UserTokenRepository';
+import EtherealMail from '@config/mail/EtherealMail';
 
 interface IRequest {
   email: string;
@@ -16,7 +17,11 @@ class SendForgotPasswordEmailService {
       throw new AppError('User does not exists.');
     }
     const token = await usersTokenRepository.generate(user.id);
-    console.log('token: ', token);
+    console.log(token);
+    await EtherealMail.sendMail({
+      to: email,
+      body: `Received password reset request: ${token?.token}`,
+    });
   }
 }
 export default SendForgotPasswordEmailService;
